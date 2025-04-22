@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import uuid
+from transcibe_audio import transcribe_audio
 
 st.title("🎙️ LinkedIn Content Generator")
 
@@ -23,5 +24,16 @@ if uploaded_file is not None:
     st.audio(file_path, format=f"audio/{file_ext}")
 
     st.session_state["audio_path"] = file_path
+
+    if "audio_path" in st.session_state:
+        if st.button("🧠 Transcribe Audio"):
+            with st.spinner("Transcribing..."):
+                print(st.session_state["audio_path"])
+                transcription = transcribe_audio.run(st.session_state["audio_path"])
+                st.text_area("📝 Transcribed Text", transcription, height=200)
+                st.session_state["transcription"] = transcription
+
 else:
     st.info("Upload an audio file to continue.")
+
+
