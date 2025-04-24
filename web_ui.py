@@ -1,14 +1,16 @@
 import streamlit as st
 import os
+import time
 import uuid
 from transcibe_audio import transcribe_audio
 from content_generation import draft_post, refined_post
+from post_on_linkedin import post_to_linkedin
 
 st.title("🎙️ LinkedIn Content Generator")
 st.header("1. Upload Your Voice Note")
 
 uploaded_file = st.file_uploader("Upload an audio file", type=["wav", "mp3", "m4a"])
-
+st.session_state["transcribed"] = True
 if uploaded_file is not None:
     file_id = str(uuid.uuid4())
     file_ext = uploaded_file.name.split('.')[-1]
@@ -27,10 +29,7 @@ if uploaded_file is not None:
     if st.button("🧠 Transcribe Audio"):
         transcription = transcribe_audio.run(st.session_state["audio_path"])
         st.session_state["transcription"] = transcription
-        st.session_state["transcribed"] = True  # <-- SET THE FLAG
-    
-else:
-    st.session_state["transcribed"] = True
+        
 
 # Step 2: Show transcription and allow user to trigger post generation
 if st.session_state.get("transcribed"):
@@ -39,18 +38,40 @@ if st.session_state.get("transcribed"):
 
     if st.button("✨ Generate LinkedIn Post"):
         st.session_state["generate_post"] = True  # <-- SET FLAG TO GENERATE POST
+    
 
 # Step 3: Generate and edit post only when flag is set
 if st.session_state.get("generate_post"):
     st.subheader("✍️ Final LinkedIn Post (Editable)")
 
-    print(st.session_state["transcription"])
+    # print(st.session_state["transcription"])
     draft = draft_post(idea=st.session_state["transcription"])
-    print(draft)
-    print('-'*30)
+    # print(draft)
+    # print('-'*30)
     refined_content = refined_post(draft_post=draft)
 
     edited_post = st.text_area("Make final edits if needed:", value=refined_content, height=300)
 
     with st.expander("🕵️ View Original Refined Output"):
         st.code(refined_content, language="markdown")
+    
+    if st.button("🚀 Post to LinkedIn"):
+        st.session_state["post_to_linkedin"] = True
+
+
+if st.session_state.get("post_to_linkedin"):
+    # print(edited_post)
+    edited_post = edited_post.replace("**", "")
+    # print(edited_post)
+    status_code, response = post_to_linkedin(edited_post)
+    # status_code, response = post_to_linkedin('Test')
+    if status_code == 201:
+        st.success("✅ Successfully posted to LinkedIn!")
+    else:
+        st.error(f"❌ Failed to post: {status_code}\n{response}")
+    
+    time.sleep(5)
+    st.session_state["generate_post"] = False
+    
+    st.session_state["post_to_linkedin"] = False
+
