@@ -34,24 +34,24 @@ def draft_post(idea):
     linkedin_chain = LLMChain(llm=model, prompt=prompt)
 
     draft_post = linkedin_chain.run(idea)
-    print(draft_post)
+    # print(draft_post)
 
-    print('-'*20)
+    # print('-'*20)
     return draft_post
     
 
 def refined_post(draft_post):
     # Refinement prompt
     refinement_template = """
-    You are an expert LinkedIn content editor. Also do not add "**" in the post content.
+    You are an expert LinkedIn content editor. Also do not add ** or * in the post content.
 
     Take the following draft post and enhance it by:
-    - Adding a strong hook at the start (curiosity, story, or bold statement)
+    - Adding a hook at the start (curiosity, story, or bold statement)
     - Making the content concise and scannable (short paras, no fluff)
     - Simplifying complex sentences
     - Formatting it with line breaks, bold ideas, and clear flow
 
-    ---
+    --- 
     {draft_post}
     ---
 
@@ -64,5 +64,5 @@ def refined_post(draft_post):
 
     # Run refinement
     refined_post = refinement_chain.run(draft_post)
-    print(refined_post)
+    # print(refined_post)
     return refined_post

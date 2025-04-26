@@ -7,9 +7,9 @@ load_dotenv()
 # Load credentials
 ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN")
 PERSON_URN = os.getenv("LINKEDIN_PERSON_URN")  # format: urn:li:person:xxxxx
-print(ACCESS_TOKEN)
-print('-'*40)
-print(PERSON_URN)
+# print(ACCESS_TOKEN)
+# print('-'*40)
+# print(PERSON_URN)
 
 headers = {
     "Authorization": f"Bearer {ACCESS_TOKEN}",
